@@ -1,0 +1,27 @@
+{
+  "name": "recipe-repo-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Solije/recipe-repo-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Solije/recipe-repo-api/issues"
+  },
+  "homepage": "https://github.com/Solije/recipe-repo-api#readme",
+  "dependencies": {
+    "body-parser": "1.18.3",
+    "cors": "2.8.5",
+    "dotenv": "6.2.0",
+    "express": "^4.16.4",
+    "mongoose": "5.4.2",
+    "morgan": "1.9.1"
+  }
+}
