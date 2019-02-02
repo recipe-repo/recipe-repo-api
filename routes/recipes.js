@@ -8,14 +8,7 @@ const router = express.Router()
 mongoose.connect('mongodb://'+process.env.DATABASE_HOST);
 
 
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './public/images')
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now())
-  }
-})
+var storage = multer.memoryStorage()
  
 const upload = multer({
   storage: storage,
@@ -55,8 +48,8 @@ router.post('/recipes', upload, (req,res) => {
  
   var recipe = new Recipe;
   recipe.name = req.body.name
-  recipe.image.data = fs.readFileSync(req.files[0].destination + '/' +req.files[0].filename);
-  recipe.image.contentType = 'image/png'
+  recipe.image.data = req.files[0].buffer
+  recipe.image.contentType = req.files[0].mimetype
 
   recipe.ingredients = req.body.ingredients
   recipe.instructions = req.body.instructions
