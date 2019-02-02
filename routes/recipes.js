@@ -1,10 +1,26 @@
-const express = require('express')
+const express = require('express');
 var mongoose = require('mongoose');
+const multer = require('multer');
 
 var Recipe = require('../Schema/recipe');
 const router = express.Router()
 
 mongoose.connect('mongodb://'+process.env.DATABASE_HOST);
+
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './public/images')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now())
+  }
+})
+ 
+const upload = multer({
+  storage: storage,
+  limits:{fileSize: 1000000},
+}).any();
 
 router.get('/recipes', (req, res) => {
   console.log("Fetching recipes")
@@ -33,19 +49,24 @@ router.get('/recipes/:id', (req, res) => {
   });
 })
 
-router.post('/recipes', (req,res) => {
-  const updated_recipe = req.body.recipe
+router.post('/recipes', upload, (req,res) => {
+  //console.log(req);
+  console.log(req.files)
  
   var recipe = new Recipe;
-  recipe.name = updated_recipe.name
-  recipe.ingredients = updated_recipe.ingredients
-  recipe.instructions = updated_recipe.instructions
-  recipe.source_name = updated_recipe.source_name
-  recipe.source_url = updated_recipe.source_url
+  recipe.name = req.body.name
+  recipe.image.data = fs.readFileSync(req.files[0].destination + '/' +req.files[0].filename);
+  recipe.image.contentType = 'image/png'
+
+  recipe.ingredients = req.body.ingredients
+  recipe.instructions = req.body.instructions
+  recipe.source_name = req.body.source_name
+  recipe.source_url = req.body.source_url
 
   // save the recipe
   recipe.save(function(err) {
     if (err) {
+      console.log(err);
       res.sendStatus(500);
       return
     }

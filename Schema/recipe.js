@@ -4,6 +4,7 @@ var Schema = mongoose.Schema;
 var RecipeSchema = new Schema({
   name: { type: String, required: true, unique: true },
   uri_safe_name: String,
+  image: { data: Buffer, contentType: String },
   source_name: String,
   source_url: String,
   ingredients: String,
