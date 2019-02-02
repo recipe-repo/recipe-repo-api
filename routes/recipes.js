@@ -16,7 +16,6 @@ router.get('/recipes', (req, res) => {
     }
   
     // object of all the recipes
-    console.log(recipes);
     res.json(recipes)
   });
 })
@@ -30,39 +29,32 @@ router.get('/recipes/:id', (req, res) => {
       return
     }
     // object of the user
-    console.log(recipe);
     res.json(recipe)
   });
 })
 
 router.post('/recipes', (req,res) => {
-  console.log("Recipe:" + req.body.recipe)
   const updated_recipe = req.body.recipe
-
-  Recipe.findById(updated_recipe.id, function(err, recipe) {
-  if (err) {
-    res.sendStatus(500)
-    return
-  }
-
+ 
+  var recipe = new Recipe;
   recipe.name = updated_recipe.name
   recipe.ingredients = updated_recipe.ingredients
   recipe.instructions = updated_recipe.instructions
   recipe.source_name = updated_recipe.source_name
   recipe.source_url = updated_recipe.source_url
 
-  // save the user
+  // save the recipe
   recipe.save(function(err) {
     if (err) {
-      res.sendStatus(500)
+      res.sendStatus(500);
       return
     }
-
-    console.log('Recipe successfully updated!');
+    else{
+      console.log('Recipe successfully updated!');
+      res.sendStatus(200);
+    }
   });
 
 });
-  
-})
 
 module.exports = router
