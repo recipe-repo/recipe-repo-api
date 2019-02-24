@@ -45,13 +45,13 @@ router.post('/recipes', upload, (req,res) => {
  
   var recipe = new Recipe;
   recipe.name = req.body.name
-  recipe.image.data = req.files[0].buffer
-  recipe.image.contentType = req.files[0].mimetype
-
   recipe.ingredients = req.body.ingredients
   recipe.instructions = req.body.instructions
   recipe.source_name = req.body.source_name
   recipe.source_url = req.body.source_url
+
+  recipe.image.data = req.files[0].buffer
+  recipe.image.contentType = req.files[0].mimetype
 
   // save the recipe
   recipe.save(function(err) {
