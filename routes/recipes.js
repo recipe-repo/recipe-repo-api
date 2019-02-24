@@ -45,7 +45,7 @@ router.post('/recipes', upload, (req,res) => {
  
   var recipe = new Recipe;
   recipe.name = req.body.name
-  recipe.ingredients = req.body.ingredients
+  recipe.ingredients = JSON.parse(req.body.ingredients)
   recipe.instructions = req.body.instructions
   recipe.source_name = req.body.source_name
   recipe.source_url = req.body.source_url
