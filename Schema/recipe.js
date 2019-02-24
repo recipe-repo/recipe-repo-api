@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var Ingredient = require('./ingredient');
 
 var RecipeSchema = new Schema({
   name: { type: String, required: true, unique: true },
@@ -7,7 +8,7 @@ var RecipeSchema = new Schema({
   image: { data: Buffer, contentType: String },
   source_name: String,
   source_url: String,
-  ingredients: String,
+  ingredients: [Ingredient],
   instructions: String,
   description: String,
   notes: String,
