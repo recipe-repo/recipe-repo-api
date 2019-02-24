@@ -12,7 +12,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
-
 const router = require("./routes/recipes.js")
 
 app.use(router)

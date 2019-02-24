@@ -5,8 +5,7 @@ const multer = require('multer');
 var Recipe = require('../Schema/recipe');
 const router = express.Router()
 
-mongoose.connect('mongodb://'+process.env.DATABASE_HOST);
-
+mongoose.connect('mongodb://' + process.env.DATABASE_HOST);
 
 var storage = multer.memoryStorage()
  
@@ -23,7 +22,7 @@ router.get('/recipes', (req, res) => {
       res.sendStatus(500)
       return
     }
-  
+ 
     // object of all the recipes
     res.json(recipes)
   });
@@ -43,8 +42,6 @@ router.get('/recipes/:id', (req, res) => {
 })
 
 router.post('/recipes', upload, (req,res) => {
-  //console.log(req);
-  console.log(req.files)
  
   var recipe = new Recipe;
   recipe.name = req.body.name
