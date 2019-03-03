@@ -47,8 +47,8 @@ router.post('/recipes', upload, (req,res) => {
   recipe.name = req.body.name
   recipe.ingredients = JSON.parse(req.body.ingredients)
   recipe.instructions = req.body.instructions
-  recipe.source_name = req.body.source_name
-  recipe.source_url = req.body.source_url
+  recipe.source_name = req.body.sourceName
+  recipe.source_url = req.body.sourceUrl
 
   if (req.files.length !== 0){
     recipe.image.data = req.files[0].buffer
