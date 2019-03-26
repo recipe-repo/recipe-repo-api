@@ -5,7 +5,17 @@ const multer = require('multer');
 var Recipe = require('../Schema/recipe');
 const router = express.Router()
 
-mongoose.connect('mongodb://' + process.env.DATABASE_HOST);
+const mongoose_options = {
+  useNewUrlParser: true,
+  user: process.env.DATABASE_USER,
+  pass: process.env.DATABASE_PW,
+  dbName: process.env.DATABASE_NAME,
+  auth:{authdb:"admin"}
+}
+mongoose.connect(process.env.DATABASE_HOST, mongoose_options).then(
+  () => { console.log("Successfully connected to MongoDB") },
+  err => { console.log(err) }
+);
 
 var storage = multer.memoryStorage()
  
