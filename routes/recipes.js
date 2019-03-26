@@ -80,4 +80,17 @@ router.post('/recipes', upload, (req,res) => {
 
 });
 
+router.get('/random', (req, res) => {
+  console.log("Fetching random recipe")
+  
+  Recipe.random(function(err, recipe) {
+    if (err) {
+      res.sendStatus(500)
+      return
+    }
+    // object of the user
+    res.json(recipe)
+  });
+})
+
 module.exports = router
