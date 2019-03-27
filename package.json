@@ -1,6 +1,6 @@
 {
   "name": "recipe-repo-api",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "app.js",
   "scripts": {
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Solije/recipe-repo-api.git"
+    "url": "git+https://github.com/TomAFrench/recipe-repo-api.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Solije/recipe-repo-api/issues"
+    "url": "https://github.com/TomAFrench/recipe-repo-api/issues"
   },
-  "homepage": "https://github.com/Solije/recipe-repo-api#readme",
+  "homepage": "https://github.com/TomAFrench/recipe-repo-api#readme",
   "dependencies": {
     "body-parser": "1.18.3",
     "cors": "2.8.5",
