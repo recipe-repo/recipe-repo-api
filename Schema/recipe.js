@@ -1,12 +1,14 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var Ingredient = require('./ingredient');
 
 var RecipeSchema = new Schema({
   name: { type: String, required: true, unique: true },
   uri_safe_name: String,
+  image: { data: Buffer, contentType: String },
   source_name: String,
   source_url: String,
-  ingredients: String,
+  ingredients: [Ingredient],
   instructions: String,
   description: String,
   notes: String,
@@ -29,6 +31,19 @@ RecipeSchema.pre('save', function(next) {
 
   next();
 });
+
+/**
+ * Return a random recipe
+ */
+RecipeSchema.statics.random = function(callback) {
+  this.estimatedDocumentCount(function(err, count) {
+    if (err) {
+      return callback(err);
+    }
+    const rand = Math.floor(Math.random() * count);
+    this.findOne().skip(rand).exec(callback);
+  }.bind(this));
+};
 
 var Recipe = mongoose.model('Recipe', RecipeSchema);
 

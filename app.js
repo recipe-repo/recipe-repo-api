@@ -12,11 +12,10 @@ app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
-
 const router = require("./routes/recipes.js")
 
 app.use(router)
 
-app.listen(3000, () => {
-  console.log("server is now up")
+app.listen(process.env.PORT, () => {
+  console.log("server is now up");
 })
