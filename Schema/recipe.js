@@ -2,34 +2,26 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Ingredient = require('./ingredient');
 
-var RecipeSchema = new Schema({
-  name: { type: String, required: true, unique: true },
-  uri_safe_name: String,
-  image: { data: Buffer, contentType: String },
-  source_name: String,
-  source_url: String,
-  ingredients: [Ingredient],
-  instructions: String,
-  description: String,
-  notes: String,
-  created_at: Date,
-  updated_at: Date
-});
+var RecipeSchema = new Schema(
+  {
+    name: { type: String, required: true, unique: true },
+    image: { data: Buffer, contentType: String },
+    source_name: String,
+    source_url: String,
+    ingredients: [Ingredient],
+    instructions: String,
+    description: String,
+    notes: String,
+  },
+  {
+    timestamps: true,
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true }
+  }
+);
 
-RecipeSchema.pre('save', function(next) {
-
-  this.uri_safe_name = encodeURI(this.name)
-  // get the current date
-  var currentDate = new Date();
-
-  // change the updated_at field to current date
-  this.updated_at = currentDate;
-
-  // if created_at doesn't exist, add to that field
-  if (!this.created_at)
-    this.created_at = currentDate;
-
-  next();
+RecipeSchema.virtual('URISafeName').get(function () {
+  return encodeURI(this.name)
 });
 
 var Recipe = mongoose.model('Recipe', RecipeSchema);
