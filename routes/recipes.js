@@ -81,15 +81,20 @@ router.post('/recipes', upload, (req,res) => {
 });
 
 router.get('/random', (req, res) => {
-  console.log("Fetching random recipe")
+  res.redirect('/random/1')
+})
+
+router.get('/random/:number', (req, res) => {
+  console.log("Fetching random recipes")
   
-  Recipe.random(function(err, recipe) {
+  const numberOfRecipes = parseInt(req.params.number, 10);
+
+  Recipe.aggregate([{ $sample: { size: numberOfRecipes } }], (err, result) => {
     if (err) {
       res.sendStatus(500)
-      return
+    } else {
+      res.json(result);
     }
-    // object of the user
-    res.json(recipe)
   });
 })
 
