@@ -32,19 +32,6 @@ RecipeSchema.pre('save', function(next) {
   next();
 });
 
-/**
- * Return a random recipe
- */
-RecipeSchema.statics.random = function(callback) {
-  this.estimatedDocumentCount(function(err, count) {
-    if (err) {
-      return callback(err);
-    }
-    const rand = Math.floor(Math.random() * count);
-    this.findOne().skip(rand).exec(callback);
-  }.bind(this));
-};
-
 var Recipe = mongoose.model('Recipe', RecipeSchema);
 
 module.exports = Recipe;
