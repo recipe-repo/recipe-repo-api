@@ -24,61 +24,85 @@ const upload = multer({
   limits:{fileSize: 10000000},
 }).any();
 
-router.get('/recipes', (req, res) => {
-  console.log("Fetching recipes")
-  
-  Recipe.find({}, function(err, recipes) {
-    if (err) {
-      res.sendStatus(500)
-      return
-    }
- 
-    // object of all the recipes
-    res.json(recipes)
-  });
-})
-
-router.get('/recipes/:id', (req, res) => {
-  console.log("Fetching recipe with id: " + req.params.id)
-  
-  Recipe.findById(req.params.id, function(err, recipe) {
-    if (err) {
-      res.sendStatus(500)
-      return
-    }
-    // object of the user
-    res.json(recipe)
-  });
-})
-
-router.post('/recipes', upload, (req,res) => {
- 
+function extractRecipe(body, files){
   var recipe = new Recipe;
-  recipe.name = req.body.name
-  recipe.ingredients = JSON.parse(req.body.ingredients)
-  recipe.instructions = req.body.instructions
-  recipe.source_name = req.body.sourceName
-  recipe.source_url = req.body.sourceUrl
+  recipe.name = body.name
+  recipe.ingredients = JSON.parse(body.ingredients)
+  recipe.instructions = body.instructions
+  recipe.source_name = body.sourceName
+  recipe.source_url = body.sourceUrl
 
-  if (req.files.length !== 0){
-    recipe.image.data = req.files[0].buffer
-    recipe.image.contentType = req.files[0].mimetype
+  if (files && files.length !== 0) {
+    recipe.image.data = files[0].buffer
+    recipe.image.contentType = files[0].mimetype
   }
+  return recipe
+}
 
-  // save the recipe
-  recipe.save(function(err) {
-    if (err) {
-      console.log(err);
-      res.sendStatus(500);
-      return
-    }
-    else{
-      console.log('Recipe successfully updated!');
-      res.sendStatus(200);
-    }
-  });
 
-});
+router.route('/recipes') 
+  .get((req, res) => {
+    console.log("Fetching recipes")
+    
+    Recipe.find({}, function(err, recipes) {
+      if (err) {
+        res.sendStatus(500)
+      } else {
+        res.json(recipes)
+      }
+    })
+  })
+  .post(upload, (req, res) => {
+    const newRecipe = extractRecipe(req.body, req.files)
+
+    newRecipe.save(function (err, savedRecipe) {
+      if (err) {
+        console.log(err)
+        res.sendStatus(500)
+      } else {
+        console.log('Recipe successfully saved!')
+        res.json(savedRecipe)
+      }
+    })
+  })
+
+router.route('/recipes/:id')
+  .get((req, res) => {
+    console.log('Fetching recipe with id: ' + req.params.id)
+
+    Recipe.findById(req.params.id, function (err, recipe) {
+      if (err) {
+        res.sendStatus(500)
+      } else {
+        res.json(recipe)
+      }      
+    })
+  })
+  .put(upload, (req, res) => {
+    var newRecipe = extractRecipe(req.body, req.files).toObject()
+    delete newRecipe._id
+
+    Recipe.findOneAndReplace({ _id: { $eq: req.params.id } }, newRecipe, (err, recipe) => {
+      if (err) {
+        console.log(err)
+        res.sendStatus(500)
+      } else {
+        console.log(recipe.name + ' successfully updated!')
+        res.sendStatus(200)
+      }
+    })
+  })
+  .delete((req, res) => {
+    Recipe.findByIdAndDelete(req.params.id, function (err, recipe) {
+      if (err) {
+        console.log(err)
+        res.sendStatus(500)
+      } else {
+        console.log(recipe.name + ' successfully deleted!')
+        res.sendStatus(200)
+      }
+    })
+  })
 
 router.get('/random', (req, res) => {
   res.redirect('/random/1')
