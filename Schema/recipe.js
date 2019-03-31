@@ -6,8 +6,8 @@ var RecipeSchema = new Schema(
   {
     name: { type: String, required: true, unique: true },
     image: { data: Buffer, contentType: String },
-    source_name: String,
-    source_url: String,
+    sourceName: String,
+    sourceUrl: String,
     ingredients: [Ingredient],
     instructions: String,
     description: String,

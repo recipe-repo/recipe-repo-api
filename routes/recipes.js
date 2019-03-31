@@ -29,8 +29,8 @@ function extractRecipe(body, files){
   recipe.name = body.name
   recipe.ingredients = JSON.parse(body.ingredients)
   recipe.instructions = body.instructions
-  recipe.source_name = body.sourceName
-  recipe.source_url = body.sourceUrl
+  recipe.sourceName = body.sourceName
+  recipe.sourceUrl = body.sourceUrl
 
   if (files && files.length !== 0) {
     recipe.image.data = files[0].buffer
