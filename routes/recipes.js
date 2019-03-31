@@ -1,31 +1,31 @@
-const express = require('express');
-var mongoose = require('mongoose');
-const multer = require('multer');
+const express = require('express')
+var mongoose = require('mongoose')
+const multer = require('multer')
 
-var Recipe = require('../Schema/recipe');
+var Recipe = require('../Schema/recipe')
 const router = express.Router()
 
-const mongoose_options = {
+const mongooseOptions = {
   useNewUrlParser: true,
   user: process.env.DATABASE_USER,
   pass: process.env.DATABASE_PW,
   dbName: process.env.DATABASE_NAME,
-  auth:{authdb:"admin"}
+  auth: { authdb: 'admin' }
 }
-mongoose.connect(process.env.DATABASE_HOST, mongoose_options).then(
-  () => { console.log("Successfully connected to MongoDB") },
+mongoose.connect(process.env.DATABASE_HOST, mongooseOptions).then(
+  () => { console.log('Successfully connected to MongoDB') },
   err => { console.log(err) }
-);
+)
 
 var storage = multer.memoryStorage()
- 
+
 const upload = multer({
   storage: storage,
-  limits:{fileSize: 10000000},
-}).any();
+  limits: { fileSize: 10000000 }
+}).any()
 
-function extractRecipe(body, files){
-  var recipe = new Recipe;
+function extractRecipe (body, files) {
+  var recipe = new Recipe()
   recipe.name = body.name
   recipe.ingredients = JSON.parse(body.ingredients)
   recipe.instructions = body.instructions
@@ -39,12 +39,11 @@ function extractRecipe(body, files){
   return recipe
 }
 
-
-router.route('/recipes') 
+router.route('/recipes')
   .get((req, res) => {
-    console.log("Fetching recipes")
-    
-    Recipe.find({}, function(err, recipes) {
+    console.log('Fetching recipes')
+
+    Recipe.find({}, function (err, recipes) {
       if (err) {
         res.sendStatus(500)
       } else {
@@ -75,7 +74,7 @@ router.route('/recipes/:id')
         res.sendStatus(500)
       } else {
         res.json(recipe)
-      }      
+      }
     })
   })
   .put(upload, (req, res) => {
@@ -109,17 +108,17 @@ router.get('/random', (req, res) => {
 })
 
 router.get('/random/:number', (req, res) => {
-  console.log("Fetching random recipes")
-  
-  const numberOfRecipes = parseInt(req.params.number, 10);
+  console.log('Fetching random recipes')
+
+  const numberOfRecipes = parseInt(req.params.number, 10)
 
   Recipe.aggregate([{ $sample: { size: numberOfRecipes } }], (err, result) => {
     if (err) {
       res.sendStatus(500)
     } else {
-      res.json(result);
+      res.json(result)
     }
-  });
+  })
 })
 
 module.exports = router

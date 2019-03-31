@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var Ingredient = require('./ingredient');
+var mongoose = require('mongoose')
+var Schema = mongoose.Schema
+var Ingredient = require('./ingredient')
 
 var RecipeSchema = new Schema(
   {
@@ -11,19 +11,19 @@ var RecipeSchema = new Schema(
     ingredients: [Ingredient],
     instructions: String,
     description: String,
-    notes: String,
+    notes: String
   },
   {
     timestamps: true,
     toObject: { virtuals: true },
     toJSON: { virtuals: true }
   }
-);
+)
 
 RecipeSchema.virtual('URISafeName').get(function () {
   return encodeURI(this.name)
-});
+})
 
-var Recipe = mongoose.model('Recipe', RecipeSchema);
+var Recipe = mongoose.model('Recipe', RecipeSchema)
 
-module.exports = Recipe;
+module.exports = Recipe
