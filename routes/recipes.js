@@ -17,14 +17,22 @@ mongoose.connect(process.env.DATABASE_HOST, mongooseOptions).then(
   err => { console.log(err) }
 )
 
-var storage = multer.memoryStorage()
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'tmp/images/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname + '-' + Date.now())
+  }
+})
 
 const upload = multer({
   storage: storage,
   limits: { fileSize: 10000000 }
 }).any()
 
-function extractRecipe (body, files) {
+function extractRecipe (request) {
+  const body = request.body
   var recipe = new Recipe()
   recipe.name = body.name
   recipe.ingredients = JSON.parse(body.ingredients)
@@ -32,11 +40,20 @@ function extractRecipe (body, files) {
   recipe.sourceName = body.sourceName
   recipe.sourceUrl = body.sourceUrl
 
+  const files = request.files
   if (files && files.length !== 0) {
-    recipe.image.data = files[0].buffer
-    recipe.image.contentType = files[0].mimetype
+    var image = { path: 'public/images/' + mongoose.Types.ObjectId() }
+    recipe.image = image
   }
+
   return recipe
+}
+
+async function deleteImage (recipe, callback) {
+  if (typeof recipe.image !== 'undefined') {
+    var fs = require('fs')
+    fs.unlink(recipe.image.path, callback)
+  }
 }
 
 router.route('/recipes')
@@ -52,7 +69,7 @@ router.route('/recipes')
     })
   })
   .post(upload, (req, res) => {
-    const newRecipe = extractRecipe(req.body, req.files)
+    const newRecipe = extractRecipe(req)
 
     newRecipe.save(function (err, savedRecipe) {
       if (err) {
@@ -61,6 +78,11 @@ router.route('/recipes')
       } else {
         console.log('Recipe successfully saved!')
         res.json(savedRecipe)
+
+        if (typeof newRecipe.image !== 'undefined') {
+          var fs = require('fs')
+          fs.rename(req.files[0].path, savedRecipe.image.path, (err) => err ? console.log('Error moving file') : null)
+        }
       }
     })
   })
@@ -78,16 +100,24 @@ router.route('/recipes/:id')
     })
   })
   .put(upload, (req, res) => {
-    var newRecipe = extractRecipe(req.body, req.files).toObject()
+    var newRecipe = extractRecipe(req).toObject()
     delete newRecipe._id
 
-    Recipe.findOneAndReplace({ _id: { $eq: req.params.id } }, newRecipe, (err, recipe) => {
+    const matchIDQuery = { _id: { $eq: req.params.id } }
+    Recipe.findOneAndUpdate(matchIDQuery, newRecipe, (err, recipe) => {
       if (err) {
         console.log(err)
         res.sendStatus(500)
       } else {
         console.log(recipe.name + ' successfully updated!')
         res.sendStatus(200)
+
+        var fs = require('fs')
+        if (typeof newRecipe.image !== 'undefined') {
+          fs.rename(req.files[0].path, newRecipe.image.path, (err) => err ? console.log('Error moving file') : null)
+
+          deleteImage(recipe)
+        }
       }
     })
   })
@@ -97,6 +127,8 @@ router.route('/recipes/:id')
         console.log(err)
         res.sendStatus(500)
       } else {
+        deleteImage(recipe)
+
         console.log(recipe.name + ' successfully deleted!')
         res.sendStatus(200)
       }
