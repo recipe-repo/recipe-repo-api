@@ -6,18 +6,6 @@ const multer = require('multer')
 
 var Recipe = require('../Schema/recipe')
 
-const mongooseOptions = {
-  useNewUrlParser: true,
-  user: process.env.DATABASE_USER,
-  pass: process.env.DATABASE_PW,
-  dbName: process.env.DATABASE_NAME,
-  auth: { authdb: 'admin' }
-}
-mongoose.connect(process.env.DATABASE_HOST, mongooseOptions).then(
-  () => { console.log('Successfully connected to MongoDB') },
-  err => { console.log(err) }
-)
-
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'tmp/images/')
