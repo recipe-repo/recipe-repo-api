@@ -1,9 +1,10 @@
 const express = require('express')
-var mongoose = require('mongoose')
+const router = express.Router()
+
+const mongoose = require('mongoose')
 const multer = require('multer')
 
 var Recipe = require('../Schema/recipe')
-const router = express.Router()
 
 const mongooseOptions = {
   useNewUrlParser: true,
@@ -56,7 +57,7 @@ async function deleteImage (recipe, callback) {
   }
 }
 
-router.route('/recipes')
+router.route('/')
   .get((req, res) => {
     console.log('Fetching recipes')
 
@@ -87,7 +88,7 @@ router.route('/recipes')
     })
   })
 
-router.route('/recipes/:id')
+router.route('/:id')
   .get((req, res) => {
     console.log('Fetching recipe with id: ' + req.params.id)
 
@@ -134,23 +135,5 @@ router.route('/recipes/:id')
       }
     })
   })
-
-router.get('/random', (req, res) => {
-  res.redirect('/random/1')
-})
-
-router.get('/random/:number', (req, res) => {
-  console.log('Fetching random recipes')
-
-  const numberOfRecipes = parseInt(req.params.number, 10)
-
-  Recipe.aggregate([{ $sample: { size: numberOfRecipes } }], (err, result) => {
-    if (err) {
-      res.sendStatus(500)
-    } else {
-      res.json(result)
-    }
-  })
-})
 
 module.exports = router

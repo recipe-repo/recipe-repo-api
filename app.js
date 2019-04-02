@@ -12,8 +12,11 @@ app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-const router = require('./routes/recipes.js')
-app.use(router)
+const recipesRouter = require('./routes/recipes.js')
+app.use('/recipes', recipesRouter)
+
+const randomRouter = require('./routes/random.js')
+app.use('/random', randomRouter)
 
 var path = require('path')
 app.use('/public/images', express.static(path.join(__dirname, '/public/images')))
