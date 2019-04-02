@@ -13,8 +13,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 const router = require('./routes/recipes.js')
-
 app.use(router)
+
+var path = require('path')
+app.use('/public/images', express.static(path.join(__dirname, '/public/images')))
 
 app.listen(process.env.PORT, () => {
   console.log('server is now up')

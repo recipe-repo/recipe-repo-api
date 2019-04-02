@@ -1,11 +1,12 @@
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 var Ingredient = require('./ingredient')
+var Image = require('./image')
 
 var RecipeSchema = new Schema(
   {
     name: { type: String, required: true, unique: true },
-    image: { data: Buffer, contentType: String },
+    image: Image,
     sourceName: String,
     sourceUrl: String,
     ingredients: [Ingredient],
