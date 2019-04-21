@@ -1,5 +1,9 @@
-node_modules
+.dockerignore
 .env
+.git
 .gitignore
-README.md
 Dockerfile
+node_modules
+public
+README.md
+tmp/images/*
