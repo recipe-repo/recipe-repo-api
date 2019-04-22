@@ -33,8 +33,9 @@ const randomRouter = require('./routes/random.js')
 app.use('/random', randomRouter)
 
 var path = require('path')
-app.use('/public/images', express.static(path.join(__dirname, '/public/images')))
+app.use('/public/images', express.static(path.join(__dirname, process.env.IMAGE_DIR)))
 
 app.listen(process.env.PORT, () => {
+  console.log('images in ' + process.env.IMAGE_DIR)
   console.log('server is now up')
 })

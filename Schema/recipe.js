@@ -6,7 +6,7 @@ var Image = require('./image')
 var RecipeSchema = new Schema(
   {
     name: { type: String, required: true, unique: true },
-    image: Image,
+    images: [Image],
     sourceName: String,
     sourceUrl: String,
     ingredients: [Ingredient],
