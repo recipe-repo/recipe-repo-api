@@ -6,6 +6,7 @@ ENV DATABASE_HOST 'mongodb://localhost'
 ENV DATABASE_NAME recipes
 ENV DATABASE_USER ""
 ENV DATABASE_PW ""
+ENV IMAGE_DIR 'public/images'
 
 WORKDIR /app
 
