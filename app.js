@@ -26,6 +26,9 @@ mongoose.connect(process.env.DATABASE_HOST, mongooseOptions).then(
   err => { console.log(err) }
 )
 
+const infoRouter = require('./routes/info.js')
+app.use('/info', infoRouter)
+
 const recipesRouter = require('./routes/recipes.js')
 app.use('/recipes', recipesRouter)
 
