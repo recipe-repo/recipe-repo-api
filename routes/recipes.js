@@ -28,6 +28,9 @@ function extractRecipe (request) {
   recipe.instructions = body.instructions
   recipe.sourceName = body.sourceName
   recipe.sourceUrl = body.sourceUrl
+  recipe.prepTime = body.prepTime
+  recipe.cookTime = body.cookTime
+  recipe.servings = body.servings
 
   recipe.images = []
   const files = request.files
@@ -116,7 +119,7 @@ router.route('/:id')
     delete newRecipe._id
 
     const matchIDQuery = { _id: { $eq: req.params.id } }
-    Recipe.findOneAndUpdate(matchIDQuery, newRecipe, (err, recipe) => {
+    Recipe.findOneAndUpdate(matchIDQuery, newRecipe, { runValidators: true }, (err, recipe) => {
       if (err) {
         console.log(err)
         res.sendStatus(500)

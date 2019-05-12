@@ -12,7 +12,17 @@ var RecipeSchema = new Schema(
     ingredients: [Ingredient],
     instructions: String,
     description: String,
-    notes: String
+    notes: String,
+    prepTime: {
+      type: Number,
+      min: [0, 'negative time']
+    },
+    cookTime: {
+      type: Number,
+      min: [0, 'negative time']
+    },
+    servings: String,
+    keywords: [String]
   },
   {
     timestamps: true,
@@ -23,6 +33,10 @@ var RecipeSchema = new Schema(
 
 RecipeSchema.virtual('URISafeName').get(function () {
   return encodeURI(this.name)
+})
+
+RecipeSchema.virtual('totalTime').get(function () {
+  return this.prepTime + this.cookTime
 })
 
 var Recipe = mongoose.model('Recipe', RecipeSchema)
