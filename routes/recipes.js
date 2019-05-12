@@ -76,7 +76,16 @@ router.route('/')
   .get((req, res) => {
     console.log('Fetching recipes')
 
-    Recipe.find({}, function (err, recipes) {
+    const searchObject = {}
+    if (typeof req.query.name !== 'undefined') {
+      searchObject['name'] = { '$regex': req.query.name, '$options': 'i' }
+    }
+    if (typeof req.query.source !== 'undefined') {
+      searchObject['sourceName'] = req.query.source
+    }
+
+    console.log(searchObject)
+    Recipe.find(searchObject, function (err, recipes) {
       if (err) {
         res.sendStatus(500)
       } else {
