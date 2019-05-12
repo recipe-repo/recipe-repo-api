@@ -20,8 +20,7 @@ const upload = multer({
   limits: { fileSize: 10000000 }
 }).any()
 
-function extractRecipe (request) {
-  const body = request.body
+function extractRecipe (body) {
   var recipe = new Recipe()
   recipe.name = body.name
   recipe.ingredients = JSON.parse(body.ingredients)
@@ -32,22 +31,19 @@ function extractRecipe (request) {
   recipe.cookTime = body.cookTime
   recipe.servings = body.servings
   recipe.keywords = body.keywords
-
-  recipe.images = []
-  const files = request.files
-  if (files && files.length !== 0) {
-    var image = { name: files[0].filename }
-    recipe.images.push(image)
-  }
-
   return recipe
 }
 
-async function deleteImage (recipe, callback) {
-  if (recipe.images.length > 0) {
-    var fs = require('fs')
-    fs.unlink(buildImagePath(recipe._id, recipe.images[0].name), callback)
+async function deleteImages (recipe, callback) {
+  for (var i = 0; i < recipe.images.length; i++) {
+    await deleteImage(recipe.id, recipe.images[i].name, () => {})
   }
+  return callback()
+}
+
+async function deleteImage (recipeID, imageName, callback) {
+  var fs = require('fs')
+  fs.unlink(buildImagePath(recipeID, imageName), callback)
 }
 
 async function moveImage (source, destination, callback) {
@@ -94,7 +90,7 @@ router.route('/')
     })
   })
   .post(upload, (req, res) => {
-    const newRecipe = extractRecipe(req)
+    const newRecipe = extractRecipe(req.body)
 
     newRecipe.save(function (err, savedRecipe) {
       if (err) {
@@ -103,11 +99,6 @@ router.route('/')
       } else {
         console.log('Recipe successfully saved!')
         res.json(savedRecipe)
-
-        if (savedRecipe.images.length > 0) {
-          const destination = buildImagePath(savedRecipe._id, savedRecipe.images[0].name)
-          moveImage(req.files[0].path, destination, (err) => err ? console.log('Error moving file') : null)
-        }
       }
     })
   })
@@ -125,8 +116,9 @@ router.route('/:id')
     })
   })
   .put(upload, (req, res) => {
-    var newRecipe = extractRecipe(req).toObject()
+    var newRecipe = extractRecipe(req.body).toObject()
     delete newRecipe._id
+    delete newRecipe.images
 
     const matchIDQuery = { _id: { $eq: req.params.id } }
     Recipe.findOneAndUpdate(matchIDQuery, newRecipe, { runValidators: true }, (err, recipe) => {
@@ -135,14 +127,7 @@ router.route('/:id')
         res.sendStatus(500)
       } else {
         console.log(recipe.name + ' successfully updated!')
-        res.sendStatus(200)
-
-        if (newRecipe.images.length > 0) {
-          const destination = buildImagePath(recipe._id, newRecipe.images[0].name)
-          moveImage(req.files[0].path, destination, (err) => err ? console.log(err) : null)
-
-          deleteImage(recipe, (err) => err ? console.log(err) : null)
-        }
+        res.json(recipe)
       }
     })
   })
@@ -152,9 +137,8 @@ router.route('/:id')
         console.log(err)
         res.sendStatus(500)
       } else {
-        deleteImage(recipe)
-
         console.log(recipe.name + ' successfully deleted!')
+        deleteImages(recipe, () => { console.log('Deleted images from ' + recipe.name) })
         res.sendStatus(200)
       }
     })
