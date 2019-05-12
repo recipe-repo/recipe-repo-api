@@ -3,9 +3,7 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const app = express()
-
-const morgan = require('morgan')
-app.use(morgan('short'))
+const logger = require('./logs')
 
 const bodyParser = require('body-parser')
 app.use(cors())
@@ -15,6 +13,7 @@ app.use(bodyParser.json())
 var mongoose = require('mongoose')
 const mongooseOptions = {
   useNewUrlParser: true,
+  useCreateIndex: true,
   user: process.env.DATABASE_USER,
   pass: process.env.DATABASE_PW,
   dbName: process.env.DATABASE_NAME,
@@ -22,8 +21,8 @@ const mongooseOptions = {
 }
 
 mongoose.connect(process.env.DATABASE_HOST, mongooseOptions).then(
-  () => { console.log('Successfully connected to MongoDB') },
-  err => { console.log(err) }
+  () => { logger.info('Successfully connected to MongoDB') },
+  err => { logger.error(err) }
 )
 
 const infoRouter = require('./routes/info.js')
@@ -39,6 +38,5 @@ var path = require('path')
 app.use('/public/images', express.static(path.join(__dirname, process.env.IMAGE_DIR)))
 
 app.listen(process.env.PORT, () => {
-  console.log('images in ' + process.env.IMAGE_DIR)
-  console.log('server is now up')
+  logger.info({ 'config': { 'image-dir': process.env.IMAGE_DIR } }, 'server is now up')
 })

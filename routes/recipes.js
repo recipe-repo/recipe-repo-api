@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const logger = require('../logs')
 
 const mongoose = require('mongoose')
 const multer = require('multer')
@@ -70,7 +71,7 @@ function buildImagePath (recipeId, imageName) {
 
 router.route('/')
   .get((req, res) => {
-    console.log('Fetching recipes')
+    logger.info('Fetching recipes')
 
     const searchObject = {}
     if (typeof req.query.name !== 'undefined') {
@@ -80,9 +81,9 @@ router.route('/')
       searchObject['sourceName'] = req.query.source
     }
 
-    console.log(searchObject)
     Recipe.find(searchObject, function (err, recipes) {
       if (err) {
+        logger.error(err)
         res.sendStatus(500)
       } else {
         res.json(recipes)
@@ -94,10 +95,10 @@ router.route('/')
 
     newRecipe.save(function (err, savedRecipe) {
       if (err) {
-        console.log(err)
+        logger.error(err)
         res.sendStatus(500)
       } else {
-        console.log('Recipe successfully saved!')
+        logger.info('Recipe successfully saved!')
         res.json(savedRecipe)
       }
     })
@@ -105,7 +106,7 @@ router.route('/')
 
 router.route('/:id')
   .get((req, res) => {
-    console.log('Fetching recipe with id: ' + req.params.id)
+    logger.info('Fetching recipe with id: ' + req.params.id)
 
     Recipe.findById(req.params.id, function (err, recipe) {
       if (err) {
@@ -123,10 +124,10 @@ router.route('/:id')
     const matchIDQuery = { _id: { $eq: req.params.id } }
     Recipe.findOneAndUpdate(matchIDQuery, newRecipe, { runValidators: true }, (err, recipe) => {
       if (err) {
-        console.log(err)
+        logger.error(err)
         res.sendStatus(500)
       } else {
-        console.log(recipe.name + ' successfully updated!')
+        logger.info(recipe.name + ' successfully updated!')
         res.json(recipe)
       }
     })
@@ -134,11 +135,11 @@ router.route('/:id')
   .delete((req, res) => {
     Recipe.findByIdAndDelete(req.params.id, function (err, recipe) {
       if (err) {
-        console.log(err)
+        logger.error(err)
         res.sendStatus(500)
       } else {
-        console.log(recipe.name + ' successfully deleted!')
-        deleteImages(recipe, () => { console.log('Deleted images from ' + recipe.name) })
+        logger.info(recipe.name + ' successfully deleted!')
+        deleteImages(recipe, () => { logger.info('Deleted images from ' + recipe.name) })
         res.sendStatus(200)
       }
     })
@@ -150,7 +151,7 @@ router.route('/:id/images')
 
     const newImage = { name: req.files[0].filename }
 
-    moveImage(req.files[0].path, destination, (err) => err ? console.log(err) : null)
+    moveImage(req.files[0].path, destination, (err) => err ? logger.error(err) : null)
     Recipe.findByIdAndUpdate(
       { _id: req.params.id },
       { $push: { images: newImage } },
@@ -172,13 +173,13 @@ router.route('/:id/images/:imageid')
   .delete((req, res) => {
     Recipe.findByIdAndUpdate(req.params.id, { $pull: { images: { name: req.params.imageid } } }, function (err, recipe) {
       if (err) {
-        console.log(err)
+        logger.error(err)
         res.sendStatus(500)
       } else {
         var fs = require('fs')
-        fs.unlink(buildImagePath(req.params.id, req.params.imageid), (err) => err ? console.log(err) : null)
+        fs.unlink(buildImagePath(req.params.id, req.params.imageid), (err) => err ? logger.error(err) : null)
 
-        console.log('image ' + req.params.imageid + ' successfully deleted!')
+        logger.info('image ' + req.params.imageid + ' successfully deleted!')
         res.sendStatus(200)
       }
     })

@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const logger = require('../logs')
 
 var Recipe = require('../Schema/recipe')
 
@@ -8,13 +9,13 @@ router.get('/', (req, res) => {
 })
 
 router.get('/:number', (req, res) => {
-  console.log('Fetching random recipes')
+  logger.info('Fetching random recipes')
 
   const numberOfRecipes = parseInt(req.params.number, 10)
 
   Recipe.aggregate([{ $sample: { size: numberOfRecipes } }], (err, result) => {
     if (err) {
-      console.log(err)
+      logger.error(err)
       res.sendStatus(500)
     } else {
       res.json(result)
