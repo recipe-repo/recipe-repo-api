@@ -31,6 +31,7 @@ function extractRecipe (request) {
   recipe.prepTime = body.prepTime
   recipe.cookTime = body.cookTime
   recipe.servings = body.servings
+  recipe.keywords = body.keywords
 
   recipe.images = []
   const files = request.files
