@@ -21,20 +21,6 @@ const upload = multer({
   limits: { fileSize: 10000000 }
 }).any()
 
-function extractRecipe (body) {
-  var recipe = new Recipe()
-  recipe.name = body.name
-  recipe.ingredients = JSON.parse(body.ingredients)
-  recipe.instructions = body.instructions
-  recipe.sourceName = body.sourceName
-  recipe.sourceUrl = body.sourceUrl
-  recipe.prepTime = body.prepTime
-  recipe.cookTime = body.cookTime
-  recipe.servings = body.servings
-  recipe.keywords = body.keywords
-  return recipe
-}
-
 async function deleteImages (recipe, callback) {
   for (var i = 0; i < recipe.images.length; i++) {
     await deleteImage(recipe.id, recipe.images[i].name, () => {})
@@ -91,7 +77,7 @@ router.route('/')
     })
   })
   .post(upload, (req, res) => {
-    const newRecipe = extractRecipe(req.body)
+    const newRecipe = new Recipe(req.body)
 
     newRecipe.save(function (err, savedRecipe) {
       if (err) {
@@ -117,7 +103,7 @@ router.route('/:id')
     })
   })
   .put(upload, (req, res) => {
-    var newRecipe = extractRecipe(req.body).toObject()
+    var newRecipe = req.body
     delete newRecipe._id
     delete newRecipe.images
 
