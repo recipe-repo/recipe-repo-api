@@ -10,7 +10,7 @@ var RecipeSchema = new Schema(
     sourceName: String,
     sourceUrl: String,
     ingredients: [Ingredient],
-    instructions: String,
+    instructions: [String],
     description: String,
     notes: String,
     prepTime: {
