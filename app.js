@@ -34,6 +34,9 @@ app.use('/recipes', recipesRouter)
 const randomRouter = require('./routes/random.js')
 app.use('/random', randomRouter)
 
+const scrapeRouter = require('./routes/scrape.js')
+app.use('/scrape', scrapeRouter)
+
 var path = require('path')
 app.use('/public/images', express.static(path.join(__dirname, process.env.IMAGE_DIR)))
 
