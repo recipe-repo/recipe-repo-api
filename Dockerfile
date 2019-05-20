@@ -14,5 +14,7 @@ COPY package.json /app
 RUN npm install
 COPY . /app
 
+RUN apk add --update python3 git && python3 -m pip install git+git://github.com/hhursev/recipe-scrapers.git
+
 EXPOSE ${PORT}
 CMD node app.js
